@@ -1,6 +1,8 @@
 ---
 title: "class8 machine learning"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -8,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # k-means clustering example
-
+test
 Let's make up some datafor testing the 'kmeans()' function
 
 ```{r}
