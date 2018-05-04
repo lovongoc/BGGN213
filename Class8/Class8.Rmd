@@ -1,8 +1,6 @@
 ---
 title: "class8 machine learning"
-output: 
-  html_document: 
-    keep_md: yes
+output: md_document
 ---
 
 ```{r setup, include=FALSE}
@@ -223,7 +221,7 @@ UK_foods <- read.csv("UK_foods.csv")
 ```
 
 ```{r}
-pcafoods <- prcomp(UK_foods, scale=TRUE)
+#pcafoods <- prcomp(UK_foods, scale=TRUE)
 ```
 
 First column is the name of the rows.
