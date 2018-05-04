@@ -1,7 +1,7 @@
 k-means clustering example
 ==========================
 
-test Let's make up some datafor testing the 'kmeans()' function
+Let's make up some datafor testing the 'kmeans()' function
 
     tmp <- c(rnorm(30,-3), rnorm(30,3)) #a vector of points from two random distributions
     x <- cbind(x=tmp, y=rev(tmp)) #binding it in a matrix with two columns, one with tmp and one with the reverse of tmp
@@ -31,8 +31,8 @@ Q. What ‘component’ of your result object details - cluster size?
     km$centers
 
     ##           x         y
-    ## 1 -2.961044  2.991680
-    ## 2  2.991680 -2.961044
+    ## 1 -3.033434  3.031429
+    ## 2  3.031429 -3.033434
 
 Plot x colored by the kmeans cluster assignment and add cluster centers
 as blue points
@@ -98,7 +98,7 @@ Plot it
 
     ## kgroups
     ##  1  2  3  4 
-    ## 17 13 17 13
+    ## 27  3 27  3
 
 and plot it
 
@@ -130,7 +130,7 @@ Step 1. Generate some example data for clustering
     colnames(x) <- c("x", "y")
     str(x)
 
-    ##  num [1:150, 1:2] 0.3862 -0.2266 0.0686 0.2194 -0.2121 ...
+    ##  num [1:150, 1:2] 0.254 0.074 0.573 -0.307 0.213 ...
     ##  - attr(*, "dimnames")=List of 2
     ##   ..$ : NULL
     ##   ..$ : chr [1:2] "x" "y"

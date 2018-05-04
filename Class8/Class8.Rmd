@@ -8,7 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # k-means clustering example
-test
+
 Let's make up some datafor testing the 'kmeans()' function
 
 ```{r}

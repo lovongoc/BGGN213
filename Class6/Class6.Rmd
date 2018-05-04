@@ -1,0 +1,175 @@
+---
+title: "map_colors_function"
+author: Long Vo ngoc
+date: 04/20/2018
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# header 1
+## header 2
+### Let's look at the poor old function
+This is the function code from Barry's student.
+
+```{r}
+#old function
+map.colors <- function (value,high.low,palette) {
+  proportion <- ((value-high.low[1])/(high.low[2]-high.low[1]))
+  index <- round ((length(palette)-1)*proportion)+1
+  return (palette[index])
+}
+```
+
+### Now let's try to understand this function...
+
+```{r}
+map.colors2 <- function (x, 
+                         high.low = range(x), #default value for high.low
+                         palette = cm.colors(100)) {  #default value for palette
+  
+  # Determine where in the 'high.low' range or values of 'x' lies. 
+  percent <- ( (x - high.low[1]) / (high.low[2] - high.low[1]) )
+  
+  # Where in the 'palette' vector of colors is this 'percent'
+  index <- round ( (length(palette) - 1)* percent) + 1
+  
+  return (palette[index])
+}
+```
+
+## Working with our own functions
+
+My first function
+
+```{r}
+add <- function(x, y=1) {
+# Sum the input x and y
+  return(x + y)
+}
+```
+
+Testing my first function
+```{r}
+add(1:20, 3)
+```
+
+
+Second function: rescale
+```{r}
+rescale <- function(x,na.rm = TRUE) {
+   rng <-range(x)
+   (x - rng[1]) / (rng[2] - rng[1])
+}
+```
+
+
+Testing 'rescale'
+```{r}
+rescale(c(1,2,3,NA,5))
+```
+
+Update second function: rescale2
+```{r}
+rescale2 <- function(x,
+                    na.rm = TRUE,
+                    plot = FALSE) {
+   if(na.rm) {
+     rng <- range(x, na.rm=na.rm)  #na.rm is a logical that indicates if NA's should be ommited
+   } else {
+     rng <- range(x)
+   }
+   
+   print("Hello")
+   
+   answer <- (x - rng[1]) / (rng[2] - rng[1])
+   
+
+   
+   print("is it me you are looking for?")
+   
+   if(plot) {
+     plot(answer, typ="b", lwd=4)
+}
+  
+   print("I can see it in ...")
+
+   return(answer)
+}
+```
+
+Testing rescale2
+```{r}
+rescale2(c(1,2,NA,3,NA,4,5,6), plot = TRUE)
+```
+
+
+# Section 1B
+```{r}
+# Can you improve this analysis code?
+library(bio3d)
+s1 <- read.pdb("4AKE")  # kinase with drug
+s2 <- read.pdb("1AKE")  # kinase no drug
+s3 <- read.pdb("1E4Y")  # kinase with drug
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor")
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+hc <- hclust( dist( rbind(s1.b, s2.b, s3.b) ) )
+plot(hc)
+```
+
+
+
+Breaking it down to better understand the program
+```{r}
+library(bio3d)
+s1 <- read.pdb("4AKE")  # kinase with drug
+s1$remark
+```
+
+```{r}
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s1.chainA$helix
+```
+
+```{r}
+s1.b <- s1.chainA$atom$b
+s1.b
+```
+
+```{r}
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+```
+
+
+
+Generalize as a function
+```{r}
+# Can you improve this analysis code?
+library(bio3d)
+s1 <- read.pdb("4AKE")  # kinase with drug
+s2 <- read.pdb("1AKE")  # kinase no drug
+s3 <- read.pdb("1E4Y")  # kinase with drug
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor")
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+```
+
+
+
+
+
+
