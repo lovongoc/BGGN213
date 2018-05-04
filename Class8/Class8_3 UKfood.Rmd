@@ -1,0 +1,51 @@
+---
+title: "Class8_3 UKfood"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#UK food exercise
+```{r}
+UK_foods <- read.csv("UK_foods.csv")
+```
+
+```{r}
+pcafoods <- prcomp(UK_foods, scale=TRUE)
+```
+
+First column is the name of the rows.
+```{r}
+updtUKfoods <- UK_foods[,2:5]
+row.names(updtUKfoods) <- UK_foods$X #alternatively, you can use x <- x[,-1] to remove column 1
+plot(updtUKfoods)
+```
+
+Use PCA on the dataset
+```{r}
+pcafoods <- prcomp(t(updtUKfoods), scale=TRUE)
+plot(pcafoods$x[,1], pcafoods$x[,2])
+text(pcafoods$x[,1], pcafoods$x[,2], labels = colnames(updtUKfoods))
+```
+
+Calculate variance
+```{r}
+pcafoods.var <- pcafoods$sdev^2
+pcafoods.var.per <- round(pcafoods.var/sum(pcafoods.var)*100, 1)
+barplot(pcafoods.var.per, main="Scree Plot", xlab="Principal Component", ylab="Percent Variation")
+```
+
+
+Try building a heatmap
+```{r}
+heatmap(as.matrix(updtUKfoods))
+```
+
+
+
+
+
+
