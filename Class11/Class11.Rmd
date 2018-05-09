@@ -1,0 +1,23 @@
+---
+title: "Class11"
+author: "LVN"
+date: "May 9, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## PDB statistics
+Q1: Download a CSV file from the PDB site (accessible from “Analyze” -> “PDB Statistics” > “by Experimental Method and Molecular Type”. Move this CSV file into your RStudio project and determine the percentage of structures solved by X-Ray and Electron Microscopy. From the website what proportion of structures are protein?
+
+```{r}
+PDBstatistics <- read.csv("Data Export Summary.csv", row.names = 1)
+percent <- PDBstatistics$Total / sum(PDBstatistics$Total)
+names(percent) <- row.names(PDBstatistics)
+print(paste("The proportion of structures solved by X-ray is", x))
+percent
+barplot(percent)
+```
+
