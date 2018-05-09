@@ -20,9 +20,9 @@ percent <- PDBstatistics$Total / sum(PDBstatistics$Total)
 names(percent) <- row.names(PDBstatistics)
 barplot(percent)
 ```
+azef
 
-
-
+bla
 
 
 

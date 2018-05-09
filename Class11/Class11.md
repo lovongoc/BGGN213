@@ -21,7 +21,7 @@ barplot(percent)
 ```
 
 ![](Class11_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
-
+azef
 
 bla
 
