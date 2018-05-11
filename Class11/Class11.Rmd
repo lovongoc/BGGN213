@@ -20,36 +20,264 @@ percent <- PDBstatistics$Total / sum(PDBstatistics$Total)
 names(percent) <- row.names(PDBstatistics)
 barplot(percent)
 ```
-azef
-
-bla
 
 
+## Using Bio3D
+
+```{r}
+library(bio3d)
+# in the console, type lbio3d to list all the functions in the package. help(package=bio3d) will open a help page for those functions.
+pdb <- read.pdb("1hsg") ## Note: Accessing on-line PDB file
+pdb
+```
+
+```{r}
+attributes(pdb)
+```
+
+
+```{r}
+head(pdb$atom)
+```
+
+```{r}
+pdb$atom[1:2, c("eleno", "elety", "x","y","z")] # Print a subset of $atom data for the first two atoms
+```
+
+
+```{r}
+# Note that individual $atom records can also be accessed like this
+pdb$atom$elety[1:2]
+```
 
 
 
 
+```{r}
+# Which allows us to do the following
+plot.bio3d(pdb$atom$b[pdb$calpha], sse=pdb, typ="l", ylab="B-factor")
+```
 
 
 
+Q7. What type of R object is pdb$atom? HINT: You can always use the str() function to get a useful summery of any R object.
+```{r}
+str(pdb$atom) #pdt$atom is a data frame
+```
+
+
+```{r}
+# Print a summary of the coordinate data in $xyz
+pdb$xyz
+```
+
+
+```{r}
+# Examine the row and column dimensions
+dim(pdb$xyz)
+```
+
+```{r}
+# Print coordinates for the first two atom
+pdb$xyz[ 1, atom2xyz(1:2) ]
+```
+
+Side-Note: The 'pdb' class. Objects created by the read.pdb() function are of class "pdb". This is recognized by other so called generic Bio3D functions (for example atom.select(), nma(), print(), summary() etc.). A generic function is a function that examines the class of its first argument, and then decides what type of operation to perform (more specifically it decides which specific method to dispatch to). So for example, the generic atom.select() function knows that the input is of class "pdb", rather than for example an AMBER parameter and topology file, and will act accordingly.
+
+
+Q8. Use the Bio3D write.pdb() function to write out a protein only PDB file for viewing inVMD. Also write out a second separate PDB file for the ligand with residue name MK1
+HINT: In Bio3D you can use the trim.pdb() function together with the pub object and your atom selections such as atom.select(pdb, ’protein’) for the fist file and atom.select(pdb, ‘ligand’) for the second.
+
+Let's select the indices of the residues/atoms corresponding to either the protein, or the ligand.
+```{r}
+inds.protein <- atom.select(pdb, "protein") #retrieve indices of the atoms corresponding to the term protein
+inds.protein #note that we have three xyz values per atom
+inds.ligand <- atom.select(pdb, "ligand")
+inds.ligand
+```
+
+Let's see if we can select the correct atoms from the whole pdb structure
+```{r}
+pdb$atom # the whole thing
+```
+
+
+```{r}
+pdb$atom[inds.protein$atom,]  #atoms from pdb that correspond to protein
+pdb$atom[inds.ligand$atom,] #atoms from pdb that correspond to ligand
+```
+
+
+```{r}
+pdb.ligand <- trim.pdb(pdb, inds=inds.ligand) #trim the pdb for ligand
+pdb.ligand
+pdb.protein <- trim.pdb(pdb, inds = inds.protein)
+pdb.protein
+```
+
+```{r}
+write.pdb(pdb.ligand, file = "1hsg_ligand.pdb")#write the corresponding .pdb files
+write.pdb(pdb.protein, file = "1hsg_protein.pdb")
+```
+
+#Section 4: Working with multiple PDB files
+
+```{r}
+# Download some example PDB files
+ids <- c("1TND_B","1AGR_A","1TAG_A","1GG2_A","1KJY_A","4G5Q_A")
+files <- get.pdb(ids, split = TRUE)
+```
+```{r}
+pdbs <- pdbaln(files, fit=TRUE)
+```
+
+```{r}
+# Extract and align the chains we are interested in
+pdbs <- pdbaln(files, fit = TRUE)
+# Print to screen a summary of the 'pdbs' object
+pdbs
+# Access the first 5 rows, and 8 columns
+pdbs$ali[1:5, 1:8]
+# Associated residues numbers
+pdbs$resno[1:5, 1:8]
+```
 
 
 
+##Basic structure analysis
+```{r}
+# Calculate sequence identity
+seqidentity(pdbs)
+# Calculate RMSD
+rmsd(pdbs)
+# Calculate RMSD
+rd <- rmsd(pdbs)
+# Clustering
+hc <- hclust(as.dist(rd))
+grps <- cutree(hc, k=3)
+# Plot results as dendrogram
+hclustplot(hc, k=3)
 
 
 
+```
 
 
 
+#Section 5:  Example Application on Adenylate Kinase (Adk)
+
+```{r}
+aa <- get.seq("1ake_A")
+# Blast or hmmer search
+b <- blast.pdb(aa)
+```
 
 
+```{r}
+# Plot a summary of search results
+hits <- plot(b)
+```
 
 
+```{r}
+head(hits$pdb.id)
+```
+
+```{r}
+# Fetch PDBs
+files <- get.pdb(hits$pdb.id, path = "pdbs", split = TRUE, gzip =
+TRUE)
+# Align structures
+pdbs <- pdbaln(files)
+# Vector containing PDB codes
+ids <- basename.pdb(pdbs$id)
+# Draw schematic alignment
+plot(pdbs, labels=ids)
+```
+
+###5.2 Sequence conservation analysis
+```{r}
+# Calculate sequence conservation
+cons <- conserv(pdbs, method="entropy22")
+# SSE annotations
+sse <- pdbs2sse(pdbs, ind=1, rm.gaps=FALSE)
+# Plot conservation per residue
+plotb3(cons, sse=sse, ylab="Sequence entropy")
+```
 
 
+###5.3 Annotate collected PDB structures
+Function pdb.annotate() provides a convenient way of annotating the PDB files we have
+collected. Below we use the function to annotate each structure to its source species. This will
+come in handy when annotating plots later on:
+
+```{r, eval = FALSE}
+library(XML)
+library(bitops)
+library(RCurl)
+anno <- pdb.annotate(ids)
+print(unique(anno$source))
+```
+
+##5.4 Principal component analysis
+Function pca() provides principal component analysis (PCA) of the structure data. PCA is a
+statistical approach used to transform a data set down to a few important components that
+describe the directions where there is most variance. In terms of protein structures PCA is used
+to capture major structural variations within an ensemble of structures.
+Function pca() provides principal component analysis (PCA) of the structure data. PCA is a
+statistical approach used to transform a data set down to a few important components that
+describe the directions where there is most variance. In terms of protein structures PCA is used
+to capture major structural variations within an ensemble of structures.
+PCA can be performed on the structural ensemble (stored in the pdbs object) with function
+pca.xyz(). To obtain meaningful results we first superimpose all structures on the invariant
+core (function core.find()).
+
+```{r}
+# find invariant core
+core <- core.find(pdbs)
+# superimpose all structures to core
+pdbs$xyz = pdbfit(pdbs, core)
+# Perform PCA
+pc.xray <- pca(pdbs)
+# Calculate RMSD
+rd <- rmsd(pdbs)
+# Structure-based clustering
+hc.rd <- hclust(dist(rd))
+grps.rd <- cutree(hc.rd, k=3)
+plot(pc.xray, 1:2, col="grey50", bg=grps.rd, pch=21, cex=1)
+```
+```{r}
+plot(pc.xray)
+```
 
 
+One can then use the identify() function to label and individual points.
+```{r,eval = FALSE}
+# Left-click on a point to label and right-click to end
+identify(pc.xray$z[,1:2], labels=basename.pdb(pdbs$id))
+```
+
+To visualize the major structural variations in the ensemble the function mktrj() can be used to
+generate a trajectory PDB file by interpolating along a give PC (eigenvector):
+```{r}
+# Visualize first principal component
+mktrj(pc.xray, pc=1, file="pc_1.pdb")
+```
 
 
+##5.5 Plotting results with ggplot2
 
+```{r}
+library(ggplot2)
+library(ggrepel)
+df <- data.frame(x=pc.xray$z[,1], y=pc.xray$z[,2])
+col <- as.factor(grps.rd)
+p <- ggplot(df, aes(x, y)) +
+ geom_point(aes(col=col), size=2) +
+ xlab("PC1") +
+ ylab("PC2") +
+ scale_color_discrete(name="Clusters") +
+ geom_text_repel(aes(label=ids))
+p
+```
 
