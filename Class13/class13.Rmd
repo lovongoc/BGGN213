@@ -1,0 +1,64 @@
+---
+title: "Class13"
+author: "LVN"
+date: "May 16, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Section 1
+Q5
+```{r}
+sample <- read.csv("373531-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378.csv")
+my.table/nrow(sample)*100
+```
+
+You can use the R functions gtools::asc() together with the seqinr::s2c() to return the values corresponding to the specified ASCII codes.
+```{r}
+library(seqinr)
+gtools::asc(seqinr::s2c("DDDDCDEDCDDDDBBDDDCC@")) - 33 # the first 33 ASCII characters have different meaning. quality value starts at 34.
+```
+
+# Section 4
+
+```{r}
+mytable <- read.table("rs8067378_ENSG00000172057.6.txt")
+summary(mytable)
+```
+
+```{r}
+boxplot(mytable)
+```
+
+```{r}
+AG.table <- mytable$exp[mytable$geno == "A/G"]
+GG.table <- mytable$exp[mytable$geno == "G/G"]
+AA.table <- mytable$exp[mytable$geno == "A/A"]
+
+summary(AG.table)
+summary(GG.table)
+summary(AA.table)
+
+length(AG.table) <- 233 #make all vectors the same length so that cbind would work
+length(GG.table) <- 233
+length(AA.table) <- 233
+
+boxplot(cbind(AA.table, AG.table, GG.table))
+
+```
+
+better way to do it
+```{r}
+boxplot(exp ~ geno, data = mytable, notch=TRUE) #notch helps visualize significance. if notch is TRUE, a notch is drawn in each side of the boxes. If the notches of two plots do not overlap this is ‘strong evidence’ that the two medians differ (Chambers et al, 1983, p. 62). See boxplot.stats for the calculations used.
+```
+
+Using ggplot2
+```{r}
+library(ggplot2)
+ggplot(mytable, aes(geno, exp)) + geom_boxplot() #aes(x axis, y axix), what type of geom plot you want to add to it
+
+```
+
